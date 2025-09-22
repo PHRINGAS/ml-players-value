@@ -1,0 +1,6 @@
+outs:
+- md5: 97b6884beb8f00e56124a7344a914c4e.dir
+  size: 555824911
+  nfiles: 10
+  hash: md5
+  path: davidcariboo_dataset
