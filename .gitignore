@@ -9,11 +9,22 @@ venv/
 # Jupyter Notebook Checkpoints
 .ipynb_checkpoints
 
-# DVC files
-.dvc/
-data/raw/
-data/processed/
-data/enriched/
+# DVC - Ignorar el cache donde se guardan los datos reales
+.dvc/cache
+.dvc/tmp
+
+# Ignorar el CONTENIDO de las carpetas de datos...
+data/raw/*
+data/processed/*
+data/enriched/*
+
+# ...PERO NO ignores los archivos .dvc (los punteros) ni los .gitignore
+!data/raw/*.dvc
+!data/raw/.gitignore
+!data/processed/*.dvc
+!data/processed/.gitignore
+!data/enriched/*.dvc
+!data/enriched/.gitignore
 
 # IDE files
 .idea/
