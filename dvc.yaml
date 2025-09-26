@@ -1,0 +1,42 @@
+stages:
+  build_master_dataset:
+    cmd: python src/etl/build_master_dataset.py
+    deps:
+      - src/etl/build_master_dataset.py
+      - data/raw/davidcariboo_dataset
+    outs:
+      - data/processed/master_player_dataset.csv
+
+  build_features:
+    cmd: python -m src.features.build_features
+    deps:
+      - src/features/build_features.py
+      - data/processed/master_player_dataset.csv
+      - configs/context.yaml
+    outs:
+      - data/processed/contextual_featured_dataset.csv
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/processed/contextual_featured_dataset.csv
+      - data/processed/master_player_dataset.csv
+      - configs/hparams.yaml
+    outs:
+      - models/lgbm_final_context_model.pkl
+      - models/model_columns.json
+    metrics:
+      - models/metrics.json
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/lgbm_final_context_model.pkl
+      - models/model_columns.json
+      - data/processed/contextual_featured_dataset.csv
+      - data/processed/master_player_dataset.csv
+      - configs/context.yaml
+    metrics:
+      - models/metrics_by_segment.json

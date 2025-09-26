@@ -1,0 +1,103 @@
+schema: '2.0'
+stages:
+  build_master_dataset:
+    cmd: python src/etl/build_master_dataset.py
+    deps:
+    - path: data/raw/davidcariboo_dataset
+      hash: md5
+      md5: 97b6884beb8f00e56124a7344a914c4e.dir
+      size: 555824911
+      nfiles: 10
+    - path: src/etl/build_master_dataset.py
+      hash: md5
+      md5: 02a5757cb29d487507f18477bfb64738
+      size: 5645
+    outs:
+    - path: data/processed/master_player_dataset.csv
+      hash: md5
+      md5: 205ee8b9ddb2b4723e30df66b030bacb
+      size: 1006519
+  build_features:
+    cmd: python -m src.features.build_features
+    deps:
+    - path: configs/context.yaml
+      hash: md5
+      md5: 3c659bfb3f09382297b8949d15b593af
+      size: 881
+    - path: data/processed/master_player_dataset.csv
+      hash: md5
+      md5: 205ee8b9ddb2b4723e30df66b030bacb
+      size: 1006519
+    - path: src/features/build_features.py
+      hash: md5
+      md5: 268d1db820daf5546d57d1335d3c4e47
+      size: 3757
+    outs:
+    - path: data/processed/contextual_featured_dataset.csv
+      hash: md5
+      md5: 9f9e7e37dc39cbbe53d8b9a6c0bf108d
+      size: 620799
+  train:
+    cmd: python src/train.py
+    deps:
+    - path: configs/hparams.yaml
+      hash: md5
+      md5: 77eabdfc8e2fb5140219f1ee8bd33d78
+      size: 428
+    - path: data/processed/contextual_featured_dataset.csv
+      hash: md5
+      md5: 9f9e7e37dc39cbbe53d8b9a6c0bf108d
+      size: 620799
+    - path: data/processed/master_player_dataset.csv
+      hash: md5
+      md5: 205ee8b9ddb2b4723e30df66b030bacb
+      size: 1006519
+    - path: src/train.py
+      hash: md5
+      md5: 171afaece81d4c26e682bc2ab067d2f9
+      size: 3136
+    outs:
+    - path: models/lgbm_final_context_model.pkl
+      hash: md5
+      md5: 0a19cb7244022ec84e42ee791c8c427e
+      size: 757001
+    - path: models/metrics.json
+      hash: md5
+      md5: 6e14019d375f4ad4eaabbd308d465ab9
+      size: 71
+    - path: models/model_columns.json
+      hash: md5
+      md5: 56b17b41bd5ad31f4522361650698f97
+      size: 172
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - path: configs/context.yaml
+      hash: md5
+      md5: 3c659bfb3f09382297b8949d15b593af
+      size: 881
+    - path: data/processed/contextual_featured_dataset.csv
+      hash: md5
+      md5: 9f9e7e37dc39cbbe53d8b9a6c0bf108d
+      size: 620799
+    - path: data/processed/master_player_dataset.csv
+      hash: md5
+      md5: 205ee8b9ddb2b4723e30df66b030bacb
+      size: 1006519
+    - path: models/lgbm_final_context_model.pkl
+      hash: md5
+      md5: 0a19cb7244022ec84e42ee791c8c427e
+      size: 757001
+    - path: models/model_columns.json
+      hash: md5
+      md5: 56b17b41bd5ad31f4522361650698f97
+      size: 172
+    - path: src/evaluate.py
+      hash: md5
+      md5: 619a21d5421ac6d91001a76170254a45
+      size: 3318
+    outs:
+    - path: models/metrics_by_segment.json
+      hash: md5
+      md5: 3aab7bdb10259ad998a1983c17a7601e
+      size: 891

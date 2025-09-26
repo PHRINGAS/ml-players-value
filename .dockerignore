@@ -1,0 +1,24 @@
+# Exclude local files not needed in image
+venv/
+.git/
+.dvc/
+.dvc/cache/
+.dvc/tmp/
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Big local data directories (DVC will manage)
+data/
+!data/raw/*.dvc
+!data/processed/*.dvc
+
+# OS/IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Tests and CI (not needed in runtime image)
+.github/
+tests/

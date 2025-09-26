@@ -1,0 +1,15 @@
+* text=auto eol=lf
+
+# Treat binary files
+*.pkl binary
+*.bin binary
+*.model binary
+
+# Jupyter notebooks - disable diffs in PRs
+*.ipynb -diff
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary

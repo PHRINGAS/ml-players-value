@@ -1,0 +1,36 @@
+# Development and training dependencies
+# Core
+numpy==2.3.3
+pandas==2.3.2
+scikit-learn==1.7.2
+lightgbm==4.6.0
+joblib==1.5.2
+PyYAML==6.0.2
+
+# Experimentation & notebooks
+jupyter==1.1.1
+seaborn==0.13.2
+matplotlib==3.10.6
+
+# Pipeline & data versioning
+dvc==3.63.0
+
+# Validation & monitoring
+pandera==0.20.3
+evidently==0.4.33
+
+# CLI / API
+typer==0.19.1
+pydantic==2.11.9
+fastapi==0.117.1
+uvicorn==0.36.0
+
+# Linting & formatting & pre-commit
+pre-commit==3.7.1
+black==24.10.0
+ruff==0.6.9
+isort==5.13.2
+nbstripout==0.6.1
+
+# Testing
+pytest==8.3.3
