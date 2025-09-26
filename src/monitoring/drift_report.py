@@ -11,12 +11,12 @@ REPORTS_DIR = os.path.join(ROOT, "reports")
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate data drift report with Evidently")
-    parser.add_argument("reference", help="Ruta al CSV de referencia (entrenamiento)")
-    parser.add_argument("current", help="Ruta al CSV actual a comparar")
+    parser.add_argument("reference", help="Path to reference CSV (training data)")
+    parser.add_argument("current", help="Path to current CSV to compare")
     parser.add_argument(
         "--output",
         default=os.path.join(REPORTS_DIR, "drift_report.html"),
-        help="Ruta de salida del reporte HTML",
+        help="Output path for HTML report",
     )
     args = parser.parse_args()
 
@@ -29,7 +29,7 @@ def main() -> None:
     report.run(reference_data=ref, current_data=cur)
     report.save_html(args.output)
 
-    print(f"Reporte de drift generado: {args.output}")
+    print(f"Data drift report generated: {args.output}")
 
 
 if __name__ == "__main__":

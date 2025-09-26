@@ -6,12 +6,12 @@ import typer
 
 from .predictor import PlayerValuePredictor, _project_root
 
-app = typer.Typer(help="CLI para el sistema de valoración de futbolistas")
+app = typer.Typer(help="CLI for the football player valuation system")
 
 
 @app.command()
 def predict(
-    input: Optional[str] = typer.Option(None, help="Ruta a un archivo JSON con los datos del jugador"),
+    input: Optional[str] = typer.Option(None, help="Path to a JSON file containing player data"),
     age: Optional[float] = typer.Option(None),
     height_in_cm: Optional[float] = typer.Option(None),
     current_club_name: Optional[str] = typer.Option(None),
@@ -21,7 +21,7 @@ def predict(
     assists: Optional[int] = typer.Option(None),
     contract_months_remaining: Optional[float] = typer.Option(None),
 ):
-    """Realiza una predicción de valor de mercado a partir de un JSON o de opciones CLI."""
+    """Generate market value prediction from JSON file or CLI options."""
     root = _project_root()
     model_path = os.environ.get("MODEL_PATH", os.path.join(root, "models", "lgbm_final_context_model.pkl"))
     columns_path = os.environ.get("COLUMNS_PATH", os.path.join(root, "models", "model_columns.json"))

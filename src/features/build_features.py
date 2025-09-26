@@ -23,13 +23,13 @@ def load_context_config(path: str) -> Dict[str, Any]:
 
 
 def compute_features(df: pd.DataFrame, context_cfg: Dict[str, Any]) -> pd.DataFrame:
-    """
-    Compute the minimal set of features required by the final model.
+    """Compute the minimal set of features required by the final model.
+
     Expected inputs present in df:
       - age, height_in_cm, minutes_played, goals, assists,
         player_club_domestic_competition_id, current_club_name
     """
-    # per-90 features
+    # Calculate per-90-minute performance metrics
     minutes_per_90 = df["minutes_played"].fillna(0) / 90.0
     denom = minutes_per_90.replace(0, np.nan)
     df_feat = pd.DataFrame()
@@ -40,15 +40,15 @@ def compute_features(df: pd.DataFrame, context_cfg: Dict[str, Any]) -> pd.DataFr
         (df["goals"].fillna(0) + df["assists"].fillna(0)) / denom
     ).replace([np.inf, -np.inf], np.nan).fillna(0)
 
-    # simple passthrough
+    # Pass through basic player attributes
     df_feat["age"] = df["age"].astype(float)
     df_feat["height_in_cm"] = df["height_in_cm"].astype(float)
 
-    # contract months remaining (if available)
+    # Calculate contract months remaining (if available)
     if "contract_months_remaining" in df.columns:
         df_feat["contract_months_remaining"] = df["contract_months_remaining"].fillna(0).astype(float)
     else:
-        # best effort: derive from expiration date if present
+        # Best effort: derive from expiration date if present
         if "contract_expiration_date" in df.columns:
             exp = pd.to_datetime(df["contract_expiration_date"], errors="coerce")
             today = pd.Timestamp.today().normalize()
@@ -57,7 +57,7 @@ def compute_features(df: pd.DataFrame, context_cfg: Dict[str, Any]) -> pd.DataFr
         else:
             df_feat["contract_months_remaining"] = 0.0
 
-    # contextual features
+    # Apply contextual adjustments based on competition and club
     league_map = context_cfg.get("league_strength_map_by_id", {})
     default_league = context_cfg.get("default_league_strength_factor", 0.4)
     df_feat["league_strength_factor"] = df["player_club_domestic_competition_id"].map(league_map).fillna(default_league)
@@ -65,7 +65,7 @@ def compute_features(df: pd.DataFrame, context_cfg: Dict[str, Any]) -> pd.DataFr
     tier1 = set(context_cfg.get("club_tier_1", []))
     df_feat["club_tier"] = df["current_club_name"].isin(tier1).astype(int)
 
-    # order columns to match model expectations if available
+    # Order columns to match model expectations if available
     if os.path.exists(MODEL_COLUMNS_PATH):
         with open(MODEL_COLUMNS_PATH, "r", encoding="utf-8") as f:
             model_cols = json.load(f)
@@ -79,15 +79,15 @@ def main():
     context_cfg = load_context_config(os.path.join(CONFIGS_DIR, "context.yaml"))
 
     if not os.path.exists(MASTER_INPUT):
-        raise FileNotFoundError(f"No se encontró el archivo maestro: {MASTER_INPUT}. Ejecuta el ETL primero.")
+        raise FileNotFoundError(f"Master dataset not found: {MASTER_INPUT}. Run ETL pipeline first.")
 
     df = pd.read_csv(MASTER_INPUT)
     feat = compute_features(df, context_cfg)
 
-    # persist
+    # Persist the enhanced dataset
     feat.to_csv(FEATURED_OUTPUT, index=False)
-    print(f"Features guardadas en: {FEATURED_OUTPUT}")
-    print(f"Dimensiones: {feat.shape}")
+    print(f"Enhanced features saved to: {FEATURED_OUTPUT}")
+    print(f"Dataset dimensions: {feat.shape}")
 
 
 if __name__ == "__main__":

@@ -35,22 +35,22 @@ def main() -> None:
 
     if not os.path.exists(FEATURES_PATH):
         raise FileNotFoundError(
-            f"No se encontró {FEATURES_PATH}. Ejecuta: python -m src.features.build_features"
+            f"Features file not found at {FEATURES_PATH}. Run: python -m src.features.build_features"
         )
     if not os.path.exists(MASTER_PATH):
         raise FileNotFoundError(
-            f"No se encontró {MASTER_PATH}. Ejecuta el ETL primero."
+            f"Master dataset not found at {MASTER_PATH}. Run ETL pipeline first."
         )
 
     X = pd.read_csv(FEATURES_PATH)
     master = pd.read_csv(MASTER_PATH)
 
-    # Align length (defensive)
+    # Align dataset lengths as defensive measure
     n = min(len(X), len(master))
     X = X.iloc[:n].copy()
     y = master.iloc[:n]["market_value_in_eur"].astype(float)
 
-    # log transform target
+    # Apply logarithmic transformation to target variable for better model performance
     y_log = np.log1p(y.values)
 
     cfg = load_hparams()
@@ -70,12 +70,12 @@ def main() -> None:
         callbacks=[lgb.early_stopping(stopping_rounds=100, verbose=False)],
     )
 
-    # Save artifacts
+    # Persist model and training artifacts
     joblib.dump(model, MODEL_PATH)
     with open(MODEL_COLUMNS_PATH, "w", encoding="utf-8") as f:
         json.dump(list(X.columns), f)
 
-    # Metrics in EUR scale
+    # Calculate performance metrics on original euro scale
     pred_log = model.predict(X_test)
     y_pred = np.expm1(pred_log)
     y_true = np.expm1(y_test)
@@ -85,11 +85,11 @@ def main() -> None:
     with open(METRICS_PATH, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
 
-    # Feature importances
+    # Save feature importance rankings
     fi = pd.DataFrame({"feature": X.columns, "importance": model.feature_importances_})
     fi.sort_values("importance", ascending=False).to_csv(FEATURE_IMPORTANCES_PATH, index=False)
 
-    print("Entrenamiento completado.")
+    print("Model training completed successfully.")
     print(json.dumps(metrics, indent=2))
 
 

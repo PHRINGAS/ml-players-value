@@ -1,7 +1,7 @@
 import os
 import sys
 
-# Ensure project root and src are on the path
+# Ensure project root and src are on the Python path for test imports
 TESTS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(TESTS_DIR)
 SRC_DIR = os.path.join(PROJECT_ROOT, "src")

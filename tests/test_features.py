@@ -8,7 +8,8 @@ from src.features.build_features import compute_features
 
 
 def test_compute_features_minimal(tmp_path):
-    # minimal input
+    """Test feature computation with minimal required input data."""
+    # Create minimal test dataset
     df = pd.DataFrame(
         {
             "age": [22.0],
@@ -27,7 +28,7 @@ def test_compute_features_minimal(tmp_path):
     }
     feat = compute_features(df, cfg)
 
-    # expected columns
+    # Verify expected feature columns are present
     expected = {
         "age",
         "height_in_cm",
@@ -41,7 +42,7 @@ def test_compute_features_minimal(tmp_path):
     }
     assert set(feat.columns) >= expected
 
-    # values
+    # Validate computed feature values
     assert np.isclose(feat.loc[0, "minutes_per_90"], 10.0)
     assert np.isclose(feat.loc[0, "goals_per_90"], 0.5)
     assert np.isclose(feat.loc[0, "assists_per_90"], 0.3)

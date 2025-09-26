@@ -47,9 +47,9 @@ def evaluate_segments(
 
 def main() -> None:
     if not (os.path.exists(MODEL_PATH) and os.path.exists(MODEL_COLUMNS_PATH)):
-        raise FileNotFoundError("Faltan artefactos del modelo. Ejecuta entrenamiento primero.")
+        raise FileNotFoundError("Model artifacts missing. Run training first.")
     if not (os.path.exists(FEATURES_PATH) and os.path.exists(MASTER_PATH)):
-        raise FileNotFoundError("Faltan datasets procesados. Ejecuta ETL y features.")
+        raise FileNotFoundError("Processed datasets missing. Run ETL and feature engineering first.")
 
     model = joblib.load(MODEL_PATH)
     with open(MODEL_COLUMNS_PATH, "r", encoding="utf-8") as f:
@@ -58,28 +58,28 @@ def main() -> None:
     X = pd.read_csv(FEATURES_PATH)
     master = pd.read_csv(MASTER_PATH)
 
-    # Align columns and length
+    # Ensure column order and dataset length alignment
     X = X[model_cols]
     n = min(len(X), len(master))
     X = X.iloc[:n].copy()
     master = master.iloc[:n].copy()
 
-    # Predict
+    # Generate predictions and convert to euro scale
     pred_log = model.predict(X)
     y_pred_eur = np.expm1(pred_log)
     y_true_eur = master["market_value_in_eur"].astype(float).values
 
-    # Global MAE
+    # Calculate global performance metrics
     metrics = {"MAE": mae(y_true_eur, y_pred_eur), "n": int(n)}
 
-    # Segments
+    # Define evaluation segments for detailed analysis
     segments = {
         "by_league": ["player_club_domestic_competition_id"],
     }
     if "position" in master.columns:
         segments["by_position"] = ["position"]
 
-    # Bucketized age (if present)
+    # Create age buckets for additional segmentation
     if "age" in master.columns:
         bins = [0, 20, 23, 26, 30, 100]
         labels = ["<=20", "21-23", "24-26", "27-30", ">30"]
